@@ -5,6 +5,7 @@ import com.aitorortegadev.games.model.dto.GameRequestDTO;
 import com.aitorortegadev.games.model.dto.GameResponseDTO;
 import com.aitorortegadev.games.model.entity.Game;
 import com.aitorortegadev.games.service.GameService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,16 +15,12 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/games")
+@RequiredArgsConstructor
 public class GameController {
 
     private final GameService gameService;
 
     private final GameMapper gameMapper;
-
-    public GameController(GameService gameService, GameMapper gameMapper) {
-        this.gameService = gameService;
-        this.gameMapper = gameMapper;
-    }
 
     @GetMapping
     public ResponseEntity<List<GameResponseDTO>> getAllGames() {

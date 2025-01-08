@@ -2,19 +2,19 @@ package com.aitorortegadev.games.controller;
 
 import com.aitorortegadev.games.model.Game;
 import com.aitorortegadev.games.service.GameService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/games")
 public class GameController {
 
-    private final GameService gameService;
+    @Autowired
+    private GameService gameService;
 
     @GetMapping
     public ResponseEntity<List<Game>> getAllGames() {

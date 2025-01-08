@@ -2,17 +2,17 @@ package com.aitorortegadev.games.service;
 
 import com.aitorortegadev.games.model.Game;
 import com.aitorortegadev.games.repository.GameRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class GameServiceImpl implements GameService {
 
-    private final GameRepository gameRepository;
+    @Autowired
+    private GameRepository gameRepository;
 
     @Override
     public List<Game> getAllGames() {

@@ -1,43 +1,79 @@
 package com.aitorortegadev.games.controller;
 
-import com.aitorortegadev.games.model.Game;
+import com.aitorortegadev.games.mapper.GameMapper;
+import com.aitorortegadev.games.model.dto.GameRequestDTO;
+import com.aitorortegadev.games.model.dto.GameResponseDTO;
+import com.aitorortegadev.games.model.entity.Game;
 import com.aitorortegadev.games.service.GameService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/games")
 public class GameController {
 
-    @Autowired
-    private GameService gameService;
+    private final GameService gameService;
+
+    private final GameMapper gameMapper;
+
+    public GameController(GameService gameService, GameMapper gameMapper) {
+        this.gameService = gameService;
+        this.gameMapper = gameMapper;
+    }
 
     @GetMapping
-    public ResponseEntity<List<Game>> getAllGames() {
-        return new ResponseEntity<>(gameService.getAllGames(), HttpStatus.OK);
+    public ResponseEntity<List<GameResponseDTO>> getAllGames() {
+        List<GameResponseDTO> responseList =
+                gameService.getAllGames()
+                        .stream()
+                        .map(gameMapper::toResponse)
+                        .toList();
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Game> getGame(@PathVariable String id) {
-        return new ResponseEntity<>(gameService.getGameById(Long.parseLong(id)), HttpStatus.OK);
+    public ResponseEntity<GameResponseDTO> getGame(@PathVariable String id) {
+        GameResponseDTO gameResponseDTO = gameService.getGameById(Long.parseLong(id))
+                        .map(gameMapper::toResponse)
+                        .orElse(null);
+        return Objects.isNull(gameResponseDTO)
+                ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
+                : new ResponseEntity<>(gameResponseDTO, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Game> createNewGame(@RequestBody Game newGame) {
-        return new ResponseEntity<>(gameService.createGame(newGame), HttpStatus.OK);
+    public ResponseEntity<Game> createNewGame(@RequestBody GameRequestDTO newGame) {
+        return new ResponseEntity<>(gameService.createGame(gameMapper.toEntity(newGame)), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Game> updateGame(@PathVariable String id, @RequestBody Game updatedGame) {
-        return new ResponseEntity<>(gameService.updateGame(Long.parseLong(id), updatedGame), HttpStatus.OK);
+    public ResponseEntity<Game> updateGame(@PathVariable String id, @RequestBody GameRequestDTO updatedGame) {
+        GameResponseDTO gameResponseDTO = gameService.getGameById(Long.parseLong(id))
+                        .map(gameMapper::toResponse)
+                        .orElse(null);
+        if (Objects.isNull(gameResponseDTO)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (gameResponseDTO.getName().equals(updatedGame.getName())){
+            return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+        }
+        return new ResponseEntity<>(gameService.updateGame(Long.parseLong(id), gameMapper.toEntity(updatedGame)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGame(@PathVariable String id) {
+        GameResponseDTO gameResponseDTO = gameService.getGameById(Long.parseLong(id))
+                        .map(gameMapper::toResponse)
+                        .orElse(null);
+
+        if (Objects.isNull(gameResponseDTO)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
         gameService.deleteGame(Long.parseLong(id));
         return new ResponseEntity<>(HttpStatus.OK);
     }

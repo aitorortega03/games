@@ -1,4 +1,4 @@
-package com.aitorortegadev.games.model;
+package com.aitorortegadev.games.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.Entity;
@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 @Data
 @NoArgsConstructor
@@ -21,7 +20,6 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     private String name;
 
 }

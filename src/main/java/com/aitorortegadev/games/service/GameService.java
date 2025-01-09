@@ -1,19 +1,20 @@
 package com.aitorortegadev.games.service;
 
-import com.aitorortegadev.games.model.entity.Game;
+import com.aitorortegadev.games.model.dto.GameRequestDTO;
+import com.aitorortegadev.games.model.dto.GameResponseDTO;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface GameService {
 
-    List<Game> getAllGames();
+    List<GameResponseDTO> getAllGames();
 
-    Optional<Game> getGameById(Long id);
+    Optional<GameResponseDTO> getGameById(Long id);
 
-    Game createGame(Game game);
+    GameResponseDTO createGame(GameRequestDTO game);
 
-    Game updateGame(Long id, Game game);
+    GameResponseDTO updateGame(Long id, GameRequestDTO game);
 
     void deleteGame(Long id);
 

@@ -1,5 +1,8 @@
 package com.aitorortegadev.games.service.impl;
 
+import com.aitorortegadev.games.mapper.GameMapper;
+import com.aitorortegadev.games.model.dto.GameRequestDTO;
+import com.aitorortegadev.games.model.dto.GameResponseDTO;
 import com.aitorortegadev.games.model.entity.Game;
 import com.aitorortegadev.games.repository.GameRepository;
 import com.aitorortegadev.games.service.GameService;
@@ -15,32 +18,38 @@ public class GameServiceImpl implements GameService {
 
     private final GameRepository gameRepository;
 
+    private final GameMapper gameMapper;
+
     @Override
-    public List<Game> getAllGames() {
-        return gameRepository.findAll();
+    public List<GameResponseDTO> getAllGames() {
+        return gameRepository.findAll()
+                .stream()
+                .map(gameMapper::toResponse)
+                .toList();
     }
 
     @Override
-    public Optional<Game> getGameById(Long id) {
-        return gameRepository.findById(id);
+    public Optional<GameResponseDTO> getGameById(Long id) {
+        return gameRepository.findById(id)
+                .map(gameMapper::toResponse);
     }
 
     @Override
-    public Game createGame(Game game) {
-        return gameRepository.save(game);
+    public GameResponseDTO createGame(GameRequestDTO game) {
+        Game newGame = gameMapper.toEntity(game);
+        Game savedGame = gameRepository.save(newGame);
+        return gameMapper.toResponse(savedGame);
     }
 
     @Override
-    public Game updateGame(Long id, Game game) {
-        if (!gameRepository.existsById(id)){
-            return gameRepository.save(game);
-        }
+    public GameResponseDTO updateGame(Long id, GameRequestDTO game) {
         return gameRepository.findById(id)
                 .map(g -> {
                     g.setName(game.getName());
                     return gameRepository.save(g);
                 })
-                .get();
+                .map(gameMapper::toResponse)
+                .orElseThrow(() -> new RuntimeException("Game not found with id: " + id));
     }
 
     @Override

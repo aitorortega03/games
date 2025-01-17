@@ -3,8 +3,8 @@ spring:
   name: games-api
   datasource:
     url: jdbc:postgresql://localhost:5432/games
-    username: admin
-    password: admin
+    username: postgres
+    password: 1234
   jpa:
     hibernate:
       ddl-auto: create-drop

@@ -1,6 +1,5 @@
 package com.aitorortegadev.games.service.impl;
 
-import com.aitorortegadev.games.mapper.GameMapper;
 import com.aitorortegadev.games.model.dto.GameRequestDTO;
 import com.aitorortegadev.games.model.dto.GameResponseDTO;
 import com.aitorortegadev.games.model.entity.Game;
@@ -18,27 +17,25 @@ public class GameServiceImpl implements GameService {
 
     private final GameRepository gameRepository;
 
-    private final GameMapper gameMapper;
-
     @Override
     public List<GameResponseDTO> getAllGames() {
         return gameRepository.findAll()
                 .stream()
-                .map(gameMapper::toResponse)
+                .map(this::toResponse)
                 .toList();
     }
 
     @Override
     public Optional<GameResponseDTO> getGameById(Long id) {
         return gameRepository.findById(id)
-                .map(gameMapper::toResponse);
+                .map(this::toResponse);
     }
 
     @Override
     public GameResponseDTO createGame(GameRequestDTO game) {
-        Game newGame = gameMapper.toEntity(game);
+        Game newGame = this.toEntity(game);
         Game savedGame = gameRepository.save(newGame);
-        return gameMapper.toResponse(savedGame);
+        return this.toResponse(savedGame);
     }
 
     @Override
@@ -48,12 +45,25 @@ public class GameServiceImpl implements GameService {
                     g.setName(game.getName());
                     return gameRepository.save(g);
                 })
-                .map(gameMapper::toResponse)
+                .map(this::toResponse)
                 .orElseThrow(() -> new RuntimeException("Game not found with id: " + id));
     }
 
     @Override
     public void deleteGame(Long id) {
         gameRepository.deleteById(id);
+    }
+
+    private Game toEntity(GameRequestDTO game) {
+        return Game.builder()
+          .name(game.getName())
+          .build();
+    }
+
+    private GameResponseDTO toResponse(Game game) {
+        return GameResponseDTO.builder()
+          .id(game.getId())
+          .name(game.getName())
+          .build();
     }
 }

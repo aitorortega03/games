@@ -29,7 +29,8 @@ public class GameController {
     }
 
     @PostMapping
-    public ResponseEntity<GameResponseDTO> createNewGame(@RequestBody GameRequestDTO newGame) {
+    public ResponseEntity<GameResponseDTO> createNewGame(@RequestHeader("userIdRequest") String userId,
+                                                         @RequestBody GameRequestDTO newGame) {
         return ResponseEntity.ok(gameService.createGame(newGame));
     }
 
